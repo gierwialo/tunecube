@@ -1,0 +1,27 @@
+services:
+    tube_backend:
+        build:
+            context: .
+            dockerfile: services/backend/Dockerfile
+        image: tube_backend
+        container_name: tube_backend
+        networks:
+            - tube_network
+            - default
+        ports:
+            - "5000:5000"
+
+    tube_frontend:
+        build:
+            context: .
+            dockerfile: services/frontend/Dockerfile
+        image: tube_frontend
+        container_name: tube_frontend
+        networks:
+            - tube_network
+            - default
+        ports:
+            - "80:80"
+networks:
+    tube_network:
+        driver: bridge

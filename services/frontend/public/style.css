@@ -1,0 +1,91 @@
+*, *:before, *:after 
+{
+  box-sizing: border-box;
+}
+
+body 
+{
+	background-color: #333333;
+	color: #515044;
+	font-family: sans-serif;
+}
+
+.music-container 
+{
+	transform: translate(-50%, -50%);
+	display: inline-block;
+	height: 400px;
+	position: absolute;
+	min-width: 400px;
+	left: 50%;
+	top: 50%;
+}
+
+.current-music, .previous-music 
+{
+	margin:0 auto;
+	margin-top:150px;
+	margin-bottom:10px;
+	background-color: #eeeeee;
+	height: 100px;
+	width: 400px;
+	z-index: 3;
+	position:relative;
+	text-align:center;
+}
+
+.previous-music 
+{
+	margin-top:50px;
+	height: 75px;
+	width: 300px;
+}
+
+.content-container
+{
+	transform: translateY(-50%);
+	top: 50%;
+	position: relative;
+}
+
+.artist-name 
+{
+	font-size: 2em;
+	font-weight: 100;
+}
+
+.song-title 
+{
+	font-size: 1em;
+	font-weight: 200;
+}
+
+.vinyl 
+{
+	animation: spin 2s linear infinite;
+	transition: all 500ms;
+	background-image: url("vinyl_record.svg");
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	border-radius: 100%;
+	height: 400px;
+	left: 0;
+	position: absolute;
+	top: 0px;
+	width: 400px;
+	z-index: 1;
+	will-change: transform, left;
+}
+
+@-webkit-keyframes spin 
+{
+	0% 
+	{
+		transform: rotate(0deg);
+	}
+	100% 
+	{
+		transform: rotate(360deg);
+	}
+}
