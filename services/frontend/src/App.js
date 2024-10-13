@@ -37,7 +37,7 @@ function App() {
           formData.append('audio', audioBlob, 'sample.webm');
 
           try {
-            const response = await fetch('http://localhost:5000/detect', {
+            const response = await fetch('/detect', {
               method: 'POST',
               body: formData,
             });

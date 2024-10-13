@@ -1,27 +1,41 @@
 services:
-    tube_backend:
+    tune_backend:
         build:
             context: .
             dockerfile: services/backend/Dockerfile
-        image: tube_backend
-        container_name: tube_backend
+        image: tune_backend
+        container_name: tune_backend
         networks:
-            - tube_network
-            - default
-        ports:
-            - "5000:5000"
-
-    tube_frontend:
+            - tune_internal
+            - tune_internet
+            
+    tune_frontend:
         build:
             context: .
             dockerfile: services/frontend/Dockerfile
-        image: tube_frontend
-        container_name: tube_frontend
+        image: tune_frontend
+        container_name: tune_frontend
         networks:
-            - tube_network
-            - default
-        ports:
-            - "80:80"
+            - tune_internal
+
+    tune_gui:
+        build:
+            context: .
+            dockerfile: services/gui/Dockerfile
+        image: tune_gui
+        container_name: tune_gui
+        privileged: true
+        networks:
+            - tune_internal
+        environment:
+            - DISPLAY=:0
+            - PULSE_SERVER=${PULSE_SERVER}
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - /mnt/wslg/:/mnt/wslg/     
 networks:
-    tube_network:
+    tune_internal:
+        internal: true  
+
+    tune_internet:
         driver: bridge
