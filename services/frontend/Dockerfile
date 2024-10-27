@@ -18,12 +18,11 @@ FROM nginx:stable-alpine
 
 RUN apk add --no-cache openssl
 
-# Generowanie certyfikatu SSL (samopodpisany)
 RUN mkdir -p /etc/ssl/private /etc/ssl/certs && \
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout /etc/ssl/private/server.key \
     -out /etc/ssl/certs/server.crt \
-    -subj "/C=PL/ST=Mazowieckie/L=Warszawa/O=TuneCube/OU=IT/CN=tune_frontend"
+    -subj "/C=PL/ST=Masovian/L=Warsaw/O=TuneCube/OU=IT/CN=tune_frontend"
 
 RUN rm /etc/nginx/conf.d/default.conf
 

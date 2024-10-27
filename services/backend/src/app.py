@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify, make_response
+import os
+import time
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 import base64
@@ -6,6 +8,11 @@ import random
 import string
 
 app = Flask(__name__)
+
+SAMPLE_STORAGE = "/tmp/samples"
+
+os.makedirs(SAMPLE_STORAGE, exist_ok=True)
+
 CORS(app)
 
 def random_string(length=10):
@@ -23,6 +30,13 @@ def detect():
         return jsonify({}), 400
 
     audio_data = audio_file.read()
+
+    timestamp = int(time.time())
+
+    file_path = os.path.join(SAMPLE_STORAGE, f"{timestamp}.webm")
+
+    with open(file_path, 'wb') as f:
+        f.write(audio_data)
 
     result = {
         "0": 

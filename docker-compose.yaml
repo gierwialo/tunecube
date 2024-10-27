@@ -8,6 +8,8 @@ services:
         networks:
             - tune_internal
             - tune_internet
+        volumes:
+            - ${DEV_SAMPLE_STORAGE}:/tmp/samples
             
     tune_frontend:
         build:
@@ -32,7 +34,7 @@ services:
             - PULSE_SERVER=${PULSE_SERVER}
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - /mnt/wslg/:/mnt/wslg/     
+            - /mnt/wslg/:/mnt/wslg/
 networks:
     tune_internal:
         internal: true  

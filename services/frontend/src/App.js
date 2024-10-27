@@ -8,6 +8,9 @@ function App() {
   const audioChunksRef = useRef([]);
   const intervalRef = useRef(null);
 
+  const sampleLength = 10 * 1000;
+  const sampleInterval = 12 * 1000;
+
   useEffect(() => {
     fetch('/template.html')
       .then(response => response.text())
@@ -56,7 +59,7 @@ function App() {
 
         recordSample();
 
-        intervalRef.current = setInterval(recordSample, 30000);
+        intervalRef.current = setInterval(recordSample, sampleInterval);
       } catch (error) {
         console.error('TuneCube: Microphone access error:', error);
       }
@@ -68,7 +71,7 @@ function App() {
 
         setTimeout(() => {
           mediaRecorderRef.current.stop();
-        }, 5000);
+        }, sampleLength);
       }
     };
 
