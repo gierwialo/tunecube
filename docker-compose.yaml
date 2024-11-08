@@ -60,10 +60,10 @@ services:
             tune_internal:
         environment:
             - DISPLAY=:0
-            - PULSE_SERVER=unix:/tmp/pulse/native
+            - PULSE_SERVER=${USING_PULSE_SERVER}
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - /var/run/user/1004/pulse/native:/tmp/pulse/native
+            - ${USING_PULSE_VOLUME}            
         profiles:
             - default
 
@@ -75,11 +75,11 @@ services:
             tune_internal:
         environment:
             - DISPLAY=:0
-            - PULSE_SERVER=unix:/tmp/pulse/native
+            - PULSE_SERVER=${USING_PULSE_SERVER}
         volumes:
-            - /tmp/.X11-unix:/tmp/.X11-unix
-            - /var/run/user/1004/pulse/native:/tmp/pulse/native
             - ./services/gui/start.sh:/home/chromium/start.sh
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${USING_PULSE_VOLUME}
         profiles:
             - develop
 networks:
