@@ -6,11 +6,27 @@ services:
         image: tune_backend
         container_name: tune_backend
         networks:
-            - tune_internal
-            - tune_internet
+            tune_internal:
+            tune_internet:
+        volumes:
+            - ${DEV_SAMPLE_STORAGE}:/tmp/samples
+        profiles:
+            - default
+
+    tune_backend_develop:
+        image: tune_backend
+        container_name: tune_backend_develop
+        networks:
+            tune_internal:
+                aliases:
+                    - tune_backend
+            tune_internet:
         volumes:
             - ${DEV_SAMPLE_STORAGE}:/tmp/samples
             - ./services/backend/src/:/app
+        profiles:
+            - develop
+
     tune_frontend:
         build:
             context: .
@@ -18,8 +34,21 @@ services:
         image: tune_frontend
         container_name: tune_frontend
         networks:
-            - tune_internal
+            tune_internal:
+        profiles:
+            - default
 
+    tune_frontend_develop:
+        image: tune_frontend
+        container_name: tune_frontend_develop
+        networks:
+            tune_internal:
+                aliases:
+                    - tune_frontend
+        volumes:
+            - ./services/frontend/src/:/app
+        profiles:
+            - develop
     tune_gui:
         build:
             context: .
@@ -28,15 +57,31 @@ services:
         container_name: tune_gui
         privileged: true
         networks:
-            - tune_internal
+            tune_internal:
         environment:
             - DISPLAY=:0
             - PULSE_SERVER=unix:/tmp/pulse/native
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - ./services/gui/start.sh:/home/chromium/start.sh
             - /var/run/user/1004/pulse/native:/tmp/pulse/native
-            #- /home/tunecube/.config/pulse/cookie:/home/chromium/.config/pulse/cookie 
+        profiles:
+            - default
+
+    tune_gui_develop:
+        image: tune_gui
+        container_name: tune_gui_develop
+        privileged: true
+        networks:
+            tune_internal:
+        environment:
+            - DISPLAY=:0
+            - PULSE_SERVER=unix:/tmp/pulse/native
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - /var/run/user/1004/pulse/native:/tmp/pulse/native
+            - ./services/gui/start.sh:/home/chromium/start.sh
+        profiles:
+            - develop
 networks:
     tune_internal:
         internal: true  
