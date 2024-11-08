@@ -102,7 +102,7 @@ def detect():
         connection.commit()
     
     connection.close()
-    
+    return '', 20
     return jsonify(get_last_two_songs()), 200
 
 

@@ -10,7 +10,7 @@ services:
             - tune_internet
         volumes:
             - ${DEV_SAMPLE_STORAGE}:/tmp/samples
-            
+            - ./services/backend/src/:/app
     tune_frontend:
         build:
             context: .
@@ -31,10 +31,12 @@ services:
             - tune_internal
         environment:
             - DISPLAY=:0
-            - PULSE_SERVER=${PULSE_SERVER}
+            - PULSE_SERVER=unix:/tmp/pulse/native
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - /mnt/wslg/:/mnt/wslg/
+            - ./services/gui/start.sh:/home/chromium/start.sh
+            - /var/run/user/1004/pulse/native:/tmp/pulse/native
+            #- /home/tunecube/.config/pulse/cookie:/home/chromium/.config/pulse/cookie 
 networks:
     tune_internal:
         internal: true  

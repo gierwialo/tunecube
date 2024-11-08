@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
     && /bin/echo -e 'export GOOGLE_API_KEY="AIzaSyCkfPOPZXDKNn8hhgu3JrA62wIgC93d44k"\nexport GOOGLE_DEFAULT_CLIENT_ID="811574891467.apps.googleusercontent.com"\nexport GOOGLE_DEFAULT_CLIENT_SECRET="kdloedMFGdGla2P1zacGjAQh"' > /etc/chromium.d/googleapikeys
 RUN adduser root pulse-access
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-RUN groupadd -r chromium && useradd -r -g chromium -G audio,video,sudo,pulse-access chromium \
+RUN groupadd -r chromium && useradd -r -g chromium -u 1004 -G audio,video,sudo,pulse-access chromium \
     && mkdir -p /home/chromium/Downloads && chown -R chromium:chromium /home/chromium
 
 USER chromium
