@@ -2,13 +2,29 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 class SpotifyWrapper:
-    def __init__(self, client_id, client_secret, redirect_uri):
-        self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-            client_id=client_id,
-            client_secret=client_secret,
-            redirect_uri=redirect_uri,
-            scope="playlist-modify-public playlist-read-private"
-        ))
+    def __init__(self, client_id, client_secret, redirect_uri, scope):
+        self.sp_oauth = SpotifyOAuth(client_id=client_id,
+                                     client_secret=client_secret,
+                                     redirect_uri=redirect_uri,
+                                     scope=scope)
+
+        self.sp = None
+
+    def getAuthorizeUrl(self):
+        return self.sp_oauth.get_authorize_url()
+
+    def getAccessToken(self, code):
+        token_info = self.sp_oauth.get_access_token(code)
+        self.sp = spotipy.Spotify(auth=token_info['access_token'])
+        return token_info
+
+    def refreshAccessToken(self, refresh_token):
+        token_info = self.sp_oauth.refresh_access_token(refresh_token)
+        self.sp = spotipy.Spotify(auth=token_info['access_token'])
+        return token_info
+
+    def setClientFromToken(self, token_info):
+        self.sp = spotipy.Spotify(auth=token_info['access_token'])
 
     def getPlayListByName(self, playlist_name):
         playlists = self.sp.current_user_playlists()
