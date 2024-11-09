@@ -11,25 +11,27 @@ SAMPLE_DB = "/tmp/samples/music_library.db"
 
 CORS(app)
 
-app.config['DATABASE'] = Database(SAMPLE_DB, SAMPLE_STORAGE)
-app.config['SHAZAM'] = ShazamWrapper()
-
 @app.before_request
 def load_resources():
-    g.db = app.config['DATABASE']
-    g.shazam = app.config['SHAZAM']
+    g.db = Database(SAMPLE_DB, SAMPLE_STORAGE)
+    g.shazam = ShazamWrapper()
 
-@app.route('/detect', methods=['GET','POST'])
+@app.teardown_request
+def destroy_resources(exception):
+    del g.shazam
+    del g.db
+    
+@app.route('/detect', methods=['POST'])
 def detect():
     file_path = g.db.saveAudioSample(request)
 
     if file_path is None:
-        return jsonify({}), 400
+        return jsonify({}), 200
 
     out = g.shazam.recognize_song(file_path)
 
     if 'track' not in out:
-        return jsonify({}), 400
+        return jsonify({}), 200
     
     out = out['track']
     
