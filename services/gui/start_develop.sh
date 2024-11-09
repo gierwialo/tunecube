@@ -4,5 +4,4 @@
 
 pulseaudio -D --verbose --exit-idle-time=-1 --start
 
-/usr/bin/chromium --window-size=1920,1080 --kiosk --use-fake-ui-for-media-stream --ignore-certificate-errors https://tune_frontend
-
+/usr/bin/chromium --window-size=1920,1080 --use-fake-ui-for-media-stream --ignore-certificate-errors https://tune_frontend

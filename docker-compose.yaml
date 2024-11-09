@@ -6,8 +6,8 @@ services:
         image: tune_backend
         container_name: tune_backend
         networks:
-            tune_internal:
-            tune_internet:
+            - tune_internal
+            - tune_internet
         volumes:
             - ${DEV_SAMPLE_STORAGE}:/tmp/samples
         profiles:
@@ -23,7 +23,7 @@ services:
             tune_internet:
         volumes:
             - ${DEV_SAMPLE_STORAGE}:/tmp/samples
-            - ./services/backend/src/:/app
+            - ./services/backend/src:/app
         profiles:
             - develop
 
@@ -34,7 +34,7 @@ services:
         image: tune_frontend
         container_name: tune_frontend
         networks:
-            tune_internal:
+            - tune_internal
         profiles:
             - default
 
@@ -49,6 +49,7 @@ services:
             - ./services/frontend/src/:/app
         profiles:
             - develop
+
     tune_gui:
         build:
             context: .
@@ -57,13 +58,13 @@ services:
         container_name: tune_gui
         privileged: true
         networks:
-            tune_internal:
+            - tune_internal
         environment:
             - DISPLAY=:0
             - PULSE_SERVER=${USING_PULSE_SERVER}
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - ${USING_PULSE_VOLUME}            
+            - ${USING_PULSE_VOLUME}
         profiles:
             - default
 
@@ -72,19 +73,19 @@ services:
         container_name: tune_gui_develop
         privileged: true
         networks:
-            tune_internal:
+            - tune_internal
         environment:
             - DISPLAY=:0
             - PULSE_SERVER=${USING_PULSE_SERVER}
         volumes:
-            - ./services/gui/start.sh:/home/chromium/start.sh
             - /tmp/.X11-unix:/tmp/.X11-unix
             - ${USING_PULSE_VOLUME}
+            - ./services/gui/start_develop.sh:/home/chromium/start.sh
         profiles:
             - develop
+
 networks:
     tune_internal:
         internal: true  
-
     tune_internet:
         driver: bridge
