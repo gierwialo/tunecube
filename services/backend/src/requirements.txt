@@ -4,4 +4,4 @@ Flask
 Flask-Cors
 Flask-Session
 shazamio
-dotenv 
+python-dotenv 

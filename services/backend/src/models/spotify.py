@@ -2,13 +2,14 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 class SpotifyWrapper:
-    def __init__(self, client_id, client_secret, redirect_uri, scope):
+    def __init__(self, client_id, client_secret, redirect_uri, scope, token_file_path='token.json', refresh_file_path='refresh.json'):
         self.sp_oauth = SpotifyOAuth(client_id=client_id,
                                      client_secret=client_secret,
                                      redirect_uri=redirect_uri,
                                      scope=scope)
-
         self.sp = None
+        self.token_file_path = token_file_path
+        self.refresh_file_path = refresh_file_path
 
     def getAuthorizeUrl(self):
         return self.sp_oauth.get_authorize_url()
@@ -25,6 +26,26 @@ class SpotifyWrapper:
 
     def setClientFromToken(self, token_info):
         self.sp = spotipy.Spotify(auth=token_info['access_token'])
+
+    def saveTokenToFile(self, token_info):
+        with open(self.token_file_path, 'w') as token_file:
+            json.dump(token_info, token_file)
+        with open(self.refresh_file_path, 'w') as refresh_file:
+            json.dump({'refresh_token': token_info['refresh_token']}, refresh_file)
+
+    def loadTokenFromFile(self):
+
+        if os.path.exists(self.token_file_path):
+            with open(self.token_file_path, 'r') as token_file:
+                return json.load(token_file)
+        elif os.path.exists(self.refresh_file_path):
+            with open(self.refresh_file_path, 'r') as refresh_file:
+                refresh_info = json.load(refresh_file)
+                if self.sp_oauth.is_token_expired(refresh_info):
+                    token_info = self.refreshAccessToken(refresh_info['refresh_token'])
+                    self.save_token_to_file(token_info)
+                    return token_info
+        return None
 
     def getPlayListByName(self, playlist_name):
         playlists = self.sp.current_user_playlists()
