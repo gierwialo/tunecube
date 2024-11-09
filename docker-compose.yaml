@@ -10,7 +10,23 @@ services:
             - tune_internet
         volumes:
             - ${DEV_SAMPLE_STORAGE}:/tmp/samples
-            
+        profiles:
+            - default
+
+    tune_backend_develop:
+        image: tune_backend
+        container_name: tune_backend_develop
+        networks:
+            tune_internal:
+                aliases:
+                    - tune_backend
+            tune_internet:
+        volumes:
+            - ${DEV_SAMPLE_STORAGE}:/tmp/samples
+            - ./services/backend/src:/app
+        profiles:
+            - develop
+
     tune_frontend:
         build:
             context: .
@@ -19,6 +35,20 @@ services:
         container_name: tune_frontend
         networks:
             - tune_internal
+        profiles:
+            - default
+
+    tune_frontend_develop:
+        image: tune_frontend
+        container_name: tune_frontend_develop
+        networks:
+            tune_internal:
+                aliases:
+                    - tune_frontend
+        volumes:
+            - ./services/frontend/src/:/app
+        profiles:
+            - develop
 
     tune_gui:
         build:
@@ -31,13 +61,31 @@ services:
             - tune_internal
         environment:
             - DISPLAY=:0
-            - PULSE_SERVER=${PULSE_SERVER}
+            - PULSE_SERVER=${USING_PULSE_SERVER}
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - /mnt/wslg/:/mnt/wslg/
+            - ${USING_PULSE_VOLUME}
+        profiles:
+            - default
+
+    tune_gui_develop:
+        image: tune_gui
+        container_name: tune_gui_develop
+        privileged: true
+        networks:
+            - tune_internal
+        environment:
+            - DISPLAY=:0
+            - PULSE_SERVER=${USING_PULSE_SERVER}
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${USING_PULSE_VOLUME}
+            - ./services/gui/start_develop.sh:/home/chromium/start.sh
+        profiles:
+            - develop
+
 networks:
     tune_internal:
         internal: true  
-
     tune_internet:
         driver: bridge
