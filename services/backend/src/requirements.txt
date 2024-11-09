@@ -1,4 +1,5 @@
 asyncio
+spotipy
 Flask
 Flask-Cors
 shazamio
