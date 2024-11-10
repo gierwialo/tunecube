@@ -5,6 +5,11 @@ services:
             dockerfile: services/backend/Dockerfile
         image: tune_backend
         container_name: tune_backend
+        environment:
+            - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+            - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+            - SPOTIFY_REDIRECT_URI=${SPOTIFY_REDIRECT_URI}
+            - PLAYLIST_NAME=${PLAYLIST_NAME}
         networks:
             - tune_internal
             - tune_internet
@@ -21,6 +26,11 @@ services:
                 aliases:
                     - tune_backend
             tune_internet:
+        environment:
+            - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+            - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+            - SPOTIFY_REDIRECT_URI=${SPOTIFY_REDIRECT_URI}
+            - PLAYLIST_NAME=${PLAYLIST_NAME}
         volumes:
             - ${DEV_SAMPLE_STORAGE}:/tmp/samples
             - ./services/backend/src:/app
@@ -59,6 +69,7 @@ services:
         privileged: true
         networks:
             - tune_internal
+            - tune_internet
         environment:
             - DISPLAY=:0
             - PULSE_SERVER=${USING_PULSE_SERVER}
@@ -67,13 +78,19 @@ services:
             - ${USING_PULSE_VOLUME}
         profiles:
             - default
-
+        depends_on:
+            - tune_backend
+            - tune_frontend
+        dns:
+            - 172.17.0.1
+            - 8.8.8.8
     tune_gui_develop:
         image: tune_gui
         container_name: tune_gui_develop
         privileged: true
         networks:
             - tune_internal
+            - tune_internet
         environment:
             - DISPLAY=:0
             - PULSE_SERVER=${USING_PULSE_SERVER}
@@ -81,9 +98,15 @@ services:
             - /tmp/.X11-unix:/tmp/.X11-unix
             - ${USING_PULSE_VOLUME}
             - ./services/gui/start_develop.sh:/home/chromium/start.sh
+        depends_on:
+            - tune_backend_develop
+            - tune_frontend_develop
+        dns:
+            - 172.17.0.1
+            - 8.8.8.8
         profiles:
             - develop
-
+            
 networks:
     tune_internal:
         internal: true  

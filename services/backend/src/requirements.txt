@@ -1,4 +1,7 @@
 asyncio
+spotipy
 Flask
 Flask-Cors
+Flask-Session
 shazamio
+python-dotenv 
