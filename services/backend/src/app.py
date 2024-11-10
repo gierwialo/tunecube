@@ -1,6 +1,9 @@
 import os
 import json
-from flask import Flask, session, request, jsonify, g, redirect, url_for
+import qrcode
+
+from io import BytesIO
+from flask import Flask, session, request, jsonify, g, redirect, url_for, send_file
 from flask_cors import CORS
 from flask_session import Session
 from dotenv import load_dotenv
@@ -84,6 +87,27 @@ def detect():
 
     return jsonify(g.db.getLastTwoSongs()), 200
     
+@app.route('/qrcode')
+def generate_qrcode():
+
+    data = g.spotify.getPlaylistUrlByName(PLAYLIST_NAME)
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill='black', back_color='white')
+
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    
+    return send_file(img_io, mimetype='image/png')
+
 @app.route('/refresh_token')
 def refresh_token():
     token_info = session.get('token_info', None)

@@ -69,6 +69,12 @@ class SpotifyWrapper:
                 return playlist
         return None
 
+    def getPlaylistUrlByName(self, playlist_name):
+        playlist = self.getPlayListByName(playlist_name)
+        if playlist:
+            return playlist['external_urls']['spotify']
+        return None
+        
     def createPlaylist(self, playlist_name):
         user_id = self.sp.current_user()['id']
         playlist = self.sp.user_playlist_create(user=user_id, name=playlist_name, public=True)
