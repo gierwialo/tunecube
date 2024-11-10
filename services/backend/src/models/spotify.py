@@ -1,3 +1,5 @@
+import json
+import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
@@ -34,13 +36,26 @@ class SpotifyWrapper:
             json.dump({'refresh_token': token_info['refresh_token']}, refresh_file)
 
     def loadTokenFromFile(self):
+        if os.path.exists(self.token_file_path):         
+            if os.path.getsize(self.token_file_path) == 0:
+                return None
 
-        if os.path.exists(self.token_file_path):
             with open(self.token_file_path, 'r') as token_file:
-                return json.load(token_file)
+                try:
+                    return json.load(token_file)
+                except json.JSONDecodeError:
+                    return None
+
         elif os.path.exists(self.refresh_file_path):
+            if os.path.getsize(self.refresh_file_path) == 0:
+                return None
+
             with open(self.refresh_file_path, 'r') as refresh_file:
-                refresh_info = json.load(refresh_file)
+                try:
+                    refresh_info = json.load(refresh_file)
+                except json.JSONDecodeError:
+                    return None
+
                 if self.sp_oauth.is_token_expired(refresh_info):
                     token_info = self.refreshAccessToken(refresh_info['refresh_token'])
                     self.save_token_to_file(token_info)

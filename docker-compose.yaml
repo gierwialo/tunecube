@@ -78,7 +78,12 @@ services:
             - ${USING_PULSE_VOLUME}
         profiles:
             - default
-
+        depends_on:
+            - tune_backend
+            - tune_frontend
+        dns:
+            - 172.17.0.1
+            - 8.8.8.8
     tune_gui_develop:
         image: tune_gui
         container_name: tune_gui_develop
@@ -93,6 +98,12 @@ services:
             - /tmp/.X11-unix:/tmp/.X11-unix
             - ${USING_PULSE_VOLUME}
             - ./services/gui/start_develop.sh:/home/chromium/start.sh
+        depends_on:
+            - tune_backend_develop
+            - tune_frontend_develop
+        dns:
+            - 172.17.0.1
+            - 8.8.8.8
         profiles:
             - develop
             

@@ -29,23 +29,22 @@ SCOPE = "playlist-modify-public playlist-read-private"
 CORS(app)
 Session(app)
 
-spotify_wrapper = SpotifyWrapper(
-    client_id=SPOTIFY_CLIENT_ID,
-    client_secret=SPOTIFY_CLIENT_SECRET,
-    redirect_uri=SPOTIFY_REDIRECT_URI,
-    scope=SCOPE,
-    token_file_path=f"{SAMPLE_STORAGE}/token.json",
-    refresh_file_path=f"{SAMPLE_STORAGE}/refresh.json"
-)
-
 @app.before_request
 def load_resources():
     g.db = Database(SAMPLE_DB, SAMPLE_STORAGE)
     g.shazam = ShazamWrapper()
-    token_info = spotify_wrapper.loadTokenFromFile()
+    g.spotify = SpotifyWrapper(
+        client_id=SPOTIFY_CLIENT_ID,
+        client_secret=SPOTIFY_CLIENT_SECRET,
+        redirect_uri=SPOTIFY_REDIRECT_URI,
+        scope=SCOPE,
+        token_file_path=f"{SAMPLE_STORAGE}/token.json",
+        refresh_file_path=f"{SAMPLE_STORAGE}/refresh.json"
+    )
+
+    token_info = g.spotify.loadTokenFromFile()
     if token_info:
-        spotify_wrapper.setClientFromToken(token_info)
-    g.spotify = spotify_wrapper
+        g.spotify.setClientFromToken(token_info)
 
 @app.teardown_request
 def destroy_resources(exception):
@@ -54,16 +53,15 @@ def destroy_resources(exception):
 
 @app.route('/login')
 def login():
-    auth_url = spotify_wrapper.getAuthorizeUrl()
-    return redirect(auth_url)
+    return redirect(g.spotify.getAuthorizeUrl())
 
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
-    token_info = spotify_wrapper.getAccessToken(code)
-    spotify_wrapper.saveTokenToFile(token_info)
+    token_info = g.spotify.getAccessToken(code)
+    g.spotify.saveTokenToFile(token_info)
     session['token_info'] = token_info
-    return redirect(url_for('hello'))
+    return redirect("https://tune_frontend", code=302)
 
 @app.route('/detect', methods=['POST'])
 def detect():
@@ -86,19 +84,19 @@ def detect():
 
     return jsonify(g.db.getLastTwoSongs()), 200
     
-@app.route('/')
-def hello():
-    return "Backend works"
-
 @app.route('/refresh_token')
 def refresh_token():
     token_info = session.get('token_info', None)
     if not token_info:
         return redirect(url_for('login'))
 
-    if spotify_wrapper.sp_oauth.is_token_expired(token_info):
-        token_info = spotify_wrapper.refreshAccessToken(token_info['refresh_token'])
-        spotify_wrapper.saveTokenToFile(token_info)
+    if g.spotify.sp_oauth.is_token_expired(token_info):
+        token_info = g.spotify.refreshAccessToken(token_info['refresh_token'])
+        g.spotify.saveTokenToFile(token_info)
         session['token_info'] = token_info
 
-    return "Token refreshed!", 200
+    return redirect("https://tune_frontend", code=302)
+
+@app.route('/')
+def hello():
+    return "Backend works"
