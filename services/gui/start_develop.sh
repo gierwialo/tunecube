@@ -4,4 +4,4 @@
 
 pulseaudio -D --verbose --exit-idle-time=-1 --start
 
-/usr/bin/chromium --no-sandbox --disable-dev-shm-usage --window-size=1920,1080 --use-fake-ui-for-media-stream --ignore-certificate-errors https://tune_frontend
+/usr/bin/chromium --no-sandbox --disable-dev-shm-usage --window-size=1920,1080 --hide-scrollbars --use-fake-ui-for-media-stream --ignore-certificate-errors https://tune_frontend
