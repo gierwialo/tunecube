@@ -3,5 +3,7 @@ spotipy
 Flask
 Flask-Cors
 Flask-Session
+qrcode
+Pillow
 shazamio
 python-dotenv 
