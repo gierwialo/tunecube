@@ -9,6 +9,10 @@ The goal of TuneCube is to make life easier for DJs, organizers, and event atten
 - **For Organizers**: If multiple DJs are performing at an event, you can provide a complete playlist of the entire event.
 - **For Attendees**: You can access the whole event playlist or simply focus on dancing, knowing that you’ll find the name of that one special song later on the display screen.
 
+## How it works?
+
+[![Watch the video](https://img.youtube.com/vi/UGeAww5lV7o/maxresdefault.jpg)](https://www.youtube.com/watch?v=UGeAww5lV7o)
+
 ## Main Features
 
 - **Song Recognition**: Utilizes Shazam to recognize songs being played.
@@ -18,7 +22,7 @@ The goal of TuneCube is to make life easier for DJs, organizers, and event atten
 ## Technologies Used
 
 - **Docker**: Containerized infrastructure for easy deployment.
-- **Backend**: Python 3.11, Flask, and Shazamio for song recognition.
+- **Backend**: Python 3.11, [Flask](https://flask.palletsprojects.com/), [Shazamio](https://github.com/shazamio/ShazamIO), and [Spotipy](https://spotipy.readthedocs.io) for song recognition.
 - **Frontend**: Node.js and React.
 - **GUI Environment**: Ubuntu, XOrg, and Chromium.
 
@@ -30,16 +34,34 @@ The goal of TuneCube is to make life easier for DJs, organizers, and event atten
 - **External Components**:
   - Sound card with microphone input and dedicated microphone.
   - External display for show the user interface and QR code.
-  - 
+
 ### Setup Instructions
 1. Clone the repository and navigate to the project directory.
-2. Configure the `.env` file with your Spotify API keys and path to the PulseAudio socket on your host machine.
+2. Configure the `.env` file with your Spotify API keys (create a new Spotify app on [Spotify Developr Dashboard](https://developer.spotify.com/dashboard)) and path to the PulseAudio socket on your host machine. 
 4. Build and start the project using Docker Compose:
    ```bash
-   docker-compose up --build
-5. Ensure that your external sound card and display are properly connected and configured.
+   $ docker-compose --profile default build
+   ```
+   ```bash
+   $ docker-compose --profile develop up -d
+   ```
+
+5. In browser open `http://tune_backend:5000/login` and log-in to Spotify
+6. Shutdown developer mode by:
+   ```bash
+   $ docker-compose --profile develop down
+   ```
+
+7. Run standard mode by:
+   ```bash
+   $ docker-compose --profile default up -d
+   ```
+
+8. Ensure that your external sound card and display are properly connected and configured.
 
 ### Hardware Prototype (Example Setup)
+
+First prototype was built from almost parts I had at home:
 
 - Display: Aputure V-Screen VS-2 FineHD (~600 PLN)
 - Board: Raspberry Pi 4 8GB (~350 PLN)
@@ -48,6 +70,8 @@ The goal of TuneCube is to make life easier for DJs, organizers, and event atten
 - Wireless USB Adapter: Lanberg NC-1200-WI (~50 PLN)
 - DC-DC Converter 12V - 5V USB-C (~30zl)
 - 12V Power Supply: POS-50-12-C2 12V/4,2A/50,4W  (~50 PLN)
+
+(I only bought a new power supply...)
 
 ![Alt Text](https://radoslaw.gierwialo.com/tunecube/poc.png)
 
@@ -63,9 +87,18 @@ This software is provided "as is", without warranty of any kind, express or impl
 
 Contributions are welcome! If you would like to contribute, feel free to fork the repository, create a feature branch, and submit a pull request. Whether it’s fixing a bug, adding new features, or improving the documentation, your help is greatly appreciated. Let’s make TuneCube even better together!
 
-## Future Updates
 
-TuneCube is currently in a proof-of-concept stage but is under active development. Planned updates include improved UI, and additional customization options for users.
+TuneCube has been divided into modules to make future development and expansion as straightforward as possible. With this structure in place, I hope you won’t have any excuses for not pitching in! 😉
+
+## Future Updates & Todos
+
+TuneCube is in a very early stage, currently at the proof-of-concept phase. Planned improvements include:
+
+- Enhanced UI scaling for small screens
+- Simplification of the `docker-compose.yaml` file, potentially by splitting it into two separate files instead of using `--profiles`
+- Storing all data inside single SQLite database
+- Simpify process for obtaining the Auth Token and Refresh Token from Spotify
+
 
 ## License
 
@@ -73,6 +106,4 @@ TuneCube is licensed under the GNU Affero General Public License (AGPL-3.0). Thi
 
 ## Acknowledgements
 
-Thank you for using TuneCube! Contributions, feedback, and suggestions are always welcome. If you have ideas for improvements or want to report a bug, feel free to open an issue or submit a pull request.
-
-
+Thank you for using TuneCube! Contributions, feedback, and suggestions are always welcome. If you have ideas for improvements or want to report a bug, feel free to open an issue, submit a pull request, or [contact me directly](https://radoslaw.gierwialo.com/#contact).
