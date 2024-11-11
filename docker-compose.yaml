@@ -1,0 +1,114 @@
+services:
+    tune_backend:
+        build:
+            context: .
+            dockerfile: services/backend/Dockerfile
+        image: tune_backend
+        container_name: tune_backend
+        environment:
+            - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+            - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+            - SPOTIFY_REDIRECT_URI=${SPOTIFY_REDIRECT_URI}
+            - PLAYLIST_NAME=${PLAYLIST_NAME}
+        networks:
+            - tune_internal
+            - tune_internet
+        volumes:
+            - ${DEV_SAMPLE_STORAGE}:/tmp/samples
+        profiles:
+            - default
+
+    tune_backend_develop:
+        image: tune_backend
+        container_name: tune_backend_develop
+        networks:
+            tune_internal:
+                aliases:
+                    - tune_backend
+            tune_internet:
+        environment:
+            - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+            - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+            - SPOTIFY_REDIRECT_URI=${SPOTIFY_REDIRECT_URI}
+            - PLAYLIST_NAME=${PLAYLIST_NAME}
+        volumes:
+            - ${DEV_SAMPLE_STORAGE}:/tmp/samples
+            - ./services/backend/src:/app
+        profiles:
+            - develop
+
+    tune_frontend:
+        build:
+            context: .
+            dockerfile: services/frontend/Dockerfile
+        image: tune_frontend
+        container_name: tune_frontend
+        networks:
+            - tune_internal
+        profiles:
+            - default
+
+    tune_frontend_develop:
+        image: tune_frontend
+        container_name: tune_frontend_develop
+        networks:
+            tune_internal:
+                aliases:
+                    - tune_frontend
+        volumes:
+            - ./services/frontend/src/:/app
+        profiles:
+            - develop
+
+    tune_gui:
+        build:
+            context: .
+            dockerfile: services/gui/Dockerfile
+        image: tune_gui
+        container_name: tune_gui
+        privileged: true
+        networks:
+            - tune_internal
+            - tune_internet
+        environment:
+            - DISPLAY=:0
+            - PULSE_SERVER=${USING_PULSE_SERVER}
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${USING_PULSE_VOLUME}
+        profiles:
+            - default
+        depends_on:
+            - tune_backend
+            - tune_frontend
+        dns:
+            - 172.17.0.1
+            - 8.8.8.8
+    tune_gui_develop:
+        image: tune_gui
+        container_name: tune_gui_develop
+        privileged: true
+        networks:
+            - tune_internal
+            - tune_internet
+        environment:
+            - DISPLAY=:0
+            - PULSE_SERVER=${USING_PULSE_SERVER}
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${USING_PULSE_VOLUME}
+            - ./services/gui/start_develop.sh:/home/chromium/start.sh
+        depends_on:
+            - tune_backend_develop
+            - tune_frontend_develop
+        dns:
+            - 172.17.0.1
+            - 8.8.8.8
+        profiles:
+            - develop
+            
+networks:
+    tune_internal:
+        internal: true  
+    tune_internet:
+        driver: bridge
